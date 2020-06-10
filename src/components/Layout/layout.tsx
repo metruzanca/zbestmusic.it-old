@@ -5,14 +5,17 @@
  * See: https://www.gatsbyjs.org/docs/use-static-query/
  */
 
-import React from "react"
-import PropTypes from "prop-types"
+import React, { useContext } from "react"
 import { useStaticQuery, graphql } from "gatsby"
+import { Global, css } from "@emotion/core"
 
-import Header from "./header"
+import { Header } from 'components'
 import "./layout.css"
+import { ThemeContext } from "contexts"
+import { Themes } from "theme"
 
-const Layout = ({ children }) => {
+export const Layout:React.FC = ({ children }) => {
+
   const data = useStaticQuery(graphql`
     query SiteTitleQuery {
       site {
@@ -23,16 +26,25 @@ const Layout = ({ children }) => {
     }
   `)
 
+  const { dark } = useContext(ThemeContext)
+
+  const theme = dark ? Themes.dark : Themes.light
+
   return (
     <>
+      <Global styles={css`
+        body{
+          background-color: ${theme.bgPrimary};
+          color: ${theme.fgPrimary};
+        }
+      `}/>
+
       <Header siteTitle={data.site.siteMetadata.title} />
-      <div
-        style={{
-          margin: `0 auto`,
-          maxWidth: 960,
-          padding: `0 1.0875rem 1.45rem`,
-        }}
-      >
+      <div style={{
+        margin: `0 auto`,
+        maxWidth: 960,
+        padding: `0 1.0875rem 1.45rem`,
+      }}>
         <main>{children}</main>
         <footer>
           © {new Date().getFullYear()}, Built with
@@ -40,12 +52,6 @@ const Layout = ({ children }) => {
           <a href="https://www.gatsbyjs.org">Gatsby</a>
         </footer>
       </div>
-    </>
+      </>
   )
 }
-
-Layout.propTypes = {
-  children: PropTypes.node.isRequired,
-}
-
-export default Layout
